@@ -41,7 +41,7 @@ class InlineResponse2003(object):
         'first': 'first',
         'last': 'last',
         'count': 'count',
-        'access_points': 'accessPoints'
+        'access_points': 'rogueAccessPointAlarms'
     }
 
     def __init__(self, first=None, last=None, count=None, access_points=None):
