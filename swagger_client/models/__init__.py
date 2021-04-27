@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-    PRIMECORE_PRIMECORE-WS
+    primecore
 
     API Definition of primecore
 
@@ -26,5 +26,6 @@ from .metrics_object_metrics_data import MetricsObjectMetricsData
 from .metrics_object_metrics_data_values import MetricsObjectMetricsDataValues
 from .metrics_object_metrics_data_x_value_property import MetricsObjectMetricsDataXValueProperty
 from .metrics_object_metrics_data_y_value_property import MetricsObjectMetricsDataYValueProperty
+from .metrics_object_metrics_data_y_values import MetricsObjectMetricsDataYValues
 from .rogue_access_point_alarm_object import RogueAccessPointAlarmObject
 from .rogue_access_point_alarm_object_rogue_ap_alarm_details import RogueAccessPointAlarmObjectRogueApAlarmDetails

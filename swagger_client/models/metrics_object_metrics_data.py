@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-    PRIMECORE_PRIMECORE-WS
+    primecore
 
     API Definition of primecore
 

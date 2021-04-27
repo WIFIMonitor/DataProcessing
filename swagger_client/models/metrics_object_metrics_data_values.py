@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-    PRIMECORE_PRIMECORE-WS
+    primecore
 
     API Definition of primecore
 
@@ -32,7 +32,7 @@ class MetricsObjectMetricsDataValues(object):
     """
     swagger_types = {
         'x_value': 'float',
-        'y_values': 'list[float]'
+        'y_values': 'MetricsObjectMetricsDataYValues'
     }
 
     attribute_map = {
@@ -80,7 +80,7 @@ class MetricsObjectMetricsDataValues(object):
         Gets the y_values of this MetricsObjectMetricsDataValues.
 
         :return: The y_values of this MetricsObjectMetricsDataValues.
-        :rtype: list[float]
+        :rtype: MetricsObjectMetricsDataYValues
         """
         return self._y_values
 
@@ -90,7 +90,7 @@ class MetricsObjectMetricsDataValues(object):
         Sets the y_values of this MetricsObjectMetricsDataValues.
 
         :param y_values: The y_values of this MetricsObjectMetricsDataValues.
-        :type: list[float]
+        :type: MetricsObjectMetricsDataYValues
         """
 
         self._y_values = y_values

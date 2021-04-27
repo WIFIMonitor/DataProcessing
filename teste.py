@@ -23,64 +23,62 @@ try:
     #
     # **GET** /AccessPoint
     #
-    # api_response = api_instance.access_point_get()
-    # pprint(api_response)
+    #api_response = api_instance.access_point_get()
+    #pprint(api_response)
     
     #
     # **GET** /AccessPoint/Count
     #
-    # api_response = api_instance.access_point_count_get()
-    # pprint(api_response)
+    #api_response = api_instance.access_point_count_get()
+    #pprint(api_response)
     
     #
     # **GET** /AccessPoint/{id}
     #
-    # api_response = api_instance.access_point_id_get(10055296)
-    # pprint(api_response)
+    #api_response = api_instance.access_point_id_get(10055296)
+    #pprint(api_response)
     
     #
-    # ERROR (devolve sempre None) -> a resolver !!!!!!!!!!!!!!!!!!!!!
     # **GET** /AccessPoint/{name}/DeviceTypeCount
     #
-    # api_response = api_instance.access_point_name_device_type_count_get("estga-sap13.core.ua.pt")
-    # pprint(api_response)
+    api_response = api_instance.access_point_name_device_type_count_get("biblioteca-ap11")
+    pprint(api_response)
     
     #
     # **GET** /AccessPoint/{name}/TotalUsernames
     #
-    # api_response = api_instance.access_point_name_total_usernames_get("dbio-ap13")
-    # pprint(api_response)
+    #api_response = api_instance.access_point_name_total_usernames_get("dbio-ap13")
+    #pprint(api_response)
     
     #
     # **GET** /Building
     #
-    # api_response = api_instance.building_get()
-    # pprint(api_response)
+    #api_response = api_instance.building_get()
+    #pprint(api_response)
 
     #
-    # ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # **GET** /NetworkMetric/{building}
     #
-    api_response = api_instance.network_metric_building_get("DBIO", "rx")
-    pprint(api_response)
+    #api_response = api_instance.network_metric_building_get("DBIO", "rx")
+    #pprint(api_response)
 
     #
     # **GET** /RogueAccessPointAlarm/Count
     #
-    # api_response = api_instance.rogue_access_point_alarm_count_get()
-    # pprint(api_response)
+    #api_response = api_instance.rogue_access_point_alarm_count_get()
+    #pprint(api_response)
 
     #
     # **GET** /RogueAccessPointAlarm
     #
-    # api_response = api_instance.rogue_access_point_alarm_get()
-    # pprint(api_response)
+    #api_response = api_instance.rogue_access_point_alarm_get()
+    #pprint(api_response)
 
     #
     # **GET** /RogueAccessPointAlarm/{id}
     #
-    # api_response = api_instance.rogue_access_point_alarm_id_get(2909414704)
-    # pprint(api_response)
+    #api_response = api_instance.rogue_access_point_alarm_id_get(2909414704)
+    #pprint(api_response)
 
 except ApiException as e:
     print("Exception when calling DefaultApi->access_point_count_get: %s\n" % e)

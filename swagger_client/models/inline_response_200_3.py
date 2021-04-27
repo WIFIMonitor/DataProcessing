@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-    PRIMECORE_PRIMECORE-WS
+    primecore
 
     API Definition of primecore
 
@@ -34,17 +34,17 @@ class InlineResponse2003(object):
         'first': 'float',
         'last': 'float',
         'count': 'float',
-        'access_points': 'list[RogueAccessPointAlarmObject]'
+        'rogue_access_point_alarms': 'list[RogueAccessPointAlarmObject]'
     }
 
     attribute_map = {
         'first': 'first',
         'last': 'last',
         'count': 'count',
-        'access_points': 'rogueAccessPointAlarms'
+        'rogue_access_point_alarms': 'rogueAccessPointAlarms'
     }
 
-    def __init__(self, first=None, last=None, count=None, access_points=None):
+    def __init__(self, first=None, last=None, count=None, rogue_access_point_alarms=None):
         """
         InlineResponse2003 - a model defined in Swagger
         """
@@ -52,7 +52,7 @@ class InlineResponse2003(object):
         self._first = None
         self._last = None
         self._count = None
-        self._access_points = None
+        self._rogue_access_point_alarms = None
 
         if first is not None:
           self.first = first
@@ -60,8 +60,8 @@ class InlineResponse2003(object):
           self.last = last
         if count is not None:
           self.count = count
-        if access_points is not None:
-          self.access_points = access_points
+        if rogue_access_point_alarms is not None:
+          self.rogue_access_point_alarms = rogue_access_point_alarms
 
     @property
     def first(self):
@@ -127,25 +127,25 @@ class InlineResponse2003(object):
         self._count = count
 
     @property
-    def access_points(self):
+    def rogue_access_point_alarms(self):
         """
-        Gets the access_points of this InlineResponse2003.
+        Gets the rogue_access_point_alarms of this InlineResponse2003.
 
-        :return: The access_points of this InlineResponse2003.
+        :return: The rogue_access_point_alarms of this InlineResponse2003.
         :rtype: list[RogueAccessPointAlarmObject]
         """
-        return self._access_points
+        return self._rogue_access_point_alarms
 
-    @access_points.setter
-    def access_points(self, access_points):
+    @rogue_access_point_alarms.setter
+    def rogue_access_point_alarms(self, rogue_access_point_alarms):
         """
-        Sets the access_points of this InlineResponse2003.
+        Sets the rogue_access_point_alarms of this InlineResponse2003.
 
-        :param access_points: The access_points of this InlineResponse2003.
+        :param rogue_access_point_alarms: The rogue_access_point_alarms of this InlineResponse2003.
         :type: list[RogueAccessPointAlarmObject]
         """
 
-        self._access_points = access_points
+        self._rogue_access_point_alarms = rogue_access_point_alarms
 
     def to_dict(self):
         """
