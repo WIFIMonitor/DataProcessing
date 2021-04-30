@@ -23,8 +23,8 @@ try:
     #
     # **GET** /AccessPoint
     #
-    #api_response = api_instance.access_point_get()
-    #pprint(api_response)
+    api_response = api_instance.access_point_get(first_result=700)
+    pprint(api_response)
     
     #
     # **GET** /AccessPoint/Count
@@ -41,8 +41,8 @@ try:
     #
     # **GET** /AccessPoint/{name}/DeviceTypeCount
     #
-    api_response = api_instance.access_point_name_device_type_count_get("biblioteca-ap11")
-    pprint(api_response)
+    #api_response = api_instance.access_point_name_device_type_count_get("biblioteca-ap11")
+    #pprint(api_response)
     
     #
     # **GET** /AccessPoint/{name}/TotalUsernames

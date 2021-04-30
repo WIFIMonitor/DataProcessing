@@ -1,0 +1,173 @@
+from __future__ import print_function
+import time
+import swagger_client
+import requests
+import json
+import openpyxl
+from pathlib import Path
+from swagger_client.rest import ApiException
+from pprint import pprint
+from requests.auth import HTTPBasicAuth
+from influxdb import InfluxDBClient
+from datetime import datetime
+
+# -------------------------------- Saving data from the xlsx file to a Dict ---------------------------------
+
+# Function to read the data given from the xlsx file
+def readXlsx(dir, fileName):
+    # Setting the path to the xlsx file:
+    xlsx_file = Path(dir, fileName)
+
+    # Read the Excel File
+    wb_obj = openpyxl.load_workbook(xlsx_file)
+
+    # Read the Active Sheet from the Excel file
+    sheet = wb_obj.active
+
+    # Max rows
+    # print(("Number of rows: %d") % (sheet.max_row))
+
+    accessPoints = {}
+    i = 0
+    for row in sheet.iter_rows(max_col=7, values_only=True):
+        if (i != 0):
+            id = row[0]
+            apData = {
+                'location' : row[1],
+                'name' : row[2],
+                'latitude' : row[3],
+                'longitude' : row[4],
+                'responsible' : row[5],
+                'building' : row[6] 
+            }
+            accessPoints[id] = apData
+        i+=1
+
+    return accessPoints
+
+xlsxData = readXlsx('.', 'PrimeCore.xlsx')
+
+# ------------------------------------------- Functions ------------------------------------------------------
+# Function to create the database
+def createDB():
+    client = InfluxDBClient("localhost", 8086, "admin", "PeiGrupo5_2021", "***REMOVED***")
+    client.create_database("***REMOVED***")
+    client.get_list_database()
+    client.switch_database("***REMOVED***")
+
+    return client
+
+# Function to get access points Info
+def getAccessPoints(api_response, client, numReq):
+    apInfo = []
+    numReq = numReq * 100;
+
+    #print("First result: "+str(numReq))
+    api_response = api_instance.access_point_get(first_result=numReq)
+
+    # Get the first index
+    firstIndex = int(api_response.first)
+
+    # Get the last index
+    lastIndex = int(api_response.last)
+
+    # Get the access points list
+    resp = api_response.access_points
+
+    stackSize = lastIndex - firstIndex
+    for i in range(0, stackSize + 1):
+        #print("Index of AP: "+str(i))
+
+        apInfo.append(int(resp[i].id))
+        apInfo.append(resp[i].name)    
+
+        # Get the building by the id
+        building = xlsxData[apInfo[0]].get('building')
+        apInfo.append(building)
+
+        apInfo.append(int(resp[i].client_count))    
+        apInfo.append(int(resp[i].client_count_2_4_g_hz))
+        apInfo.append(int(resp[i].client_count_5_g_hz))    
+
+        # Write on database
+        writeAccessPointsOnDB(client, apInfo)
+
+        # Clearing the list of access points Info
+        apInfo.clear()
+    #print("---------------------------------------------------")
+
+# Function to write the access points Info on the database
+def writeAccessPointsOnDB(client, info):
+    # Data to send to the database
+    json_payload = []
+
+    #
+    # Note: tags -> metadata about the measurement 
+    #       fields -> a measurement that changes over time
+    #
+
+    data = { 
+        "measurement" : "clientsCount",
+        "time" : datetime.now(),
+        "tags" : {
+            "id" : info[0],
+            "name" : info[1],
+            "building" : info[2]
+        },
+        "fields" : {
+            "clientsCount" : info[3],
+            "clientsCount2_4Ghz" : info[4],
+            "clientsCount5Ghz" : info[5]
+        }
+    }
+
+    # Send data to the API
+    json_payload.append(data)
+    client.write_points(json_payload)
+
+# Function to call the API to get the access points
+def apiGetAccessPoint(api_instance, client):
+    # To get the total number of working access points
+    apsCount = int(api_instance.access_point_count_get().count)
+
+    #print("APs Count: "+str(apsCount))
+
+    # Defining the number os API requests needed
+    numberReq = int(apsCount / 100)
+
+    extraReq = 0
+    if(apsCount % 100 != 0):
+        extraReq = 1
+
+    #print("Number os requests: "+str(numberReq+extraReq))
+
+    for index in range (0, numberReq+extraReq):
+        #print("Index from API request:" +str(index))
+
+        # Calling function to get the access points info
+        getAccessPoints(api_instance, client, index)
+
+# ------------------------------------------ Main Function --------------------------------------------------- 
+
+# Creating the database
+client = createDB()
+
+# Getting the access token
+url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
+header = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+x = requests.post(url,headers=header,auth=HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+resp = x.json()
+
+# Configure OAuth2 access token for authorization
+swagger_client.configuration.access_token = resp["access_token"]
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()  
+
+# Calling API methods
+try:
+    # Calling the API to get the access points
+    apiGetAccessPoint(api_instance, client)
+except ApiException as e:
+    print("Exception when calling DefaultApi->access_point_count_get: %s\n" % e)
