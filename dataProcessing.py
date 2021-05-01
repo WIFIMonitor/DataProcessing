@@ -5,6 +5,8 @@ import requests
 import json
 import openpyxl
 import math
+import schedule
+import time
 from bullet import VerticalPrompt, Password, Input
 from pathlib import Path
 from swagger_client.rest import ApiException
@@ -53,6 +55,9 @@ xlsxData = readXlsx('.', 'PrimeCore.xlsx')
 
 # Function to get the API access token (expires each hour)
 def getAPIAccessToken():
+    global api_instance 
+    print("Calling token")
+
     # Getting the access token
     url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
     header = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -63,10 +68,10 @@ def getAPIAccessToken():
     # Configure OAuth2 access token for authorization
     swagger_client.configuration.access_token = resp["access_token"]
 
+    print("token: "+str(resp["access_token"]))
+
     # create an instance of the API class
     api_instance = swagger_client.DefaultApi()  
-
-    return api_instance
 
 # Function to create the database
 def createDB():
@@ -85,7 +90,7 @@ def createDB():
     return client
 
 # Function to get access points Info
-def getAccessPoints(api_response, client, numReq):
+def getAccessPoints(client, numReq):
     apInfo = []
     numReq = numReq * 100;
 
@@ -149,7 +154,9 @@ def writeAccessPointsOnDB(client, info):
     client.write_points(json_payload)
 
 # Function to call the API to get the access points
-def apiGetAccessPoint(api_instance, client):
+def apiGetAccessPoint(client):
+    print("Calling Access Points")
+
     # To get the total number of working access points
     apsCount = int(api_instance.access_point_count_get().count)
 
@@ -158,19 +165,26 @@ def apiGetAccessPoint(api_instance, client):
 
     for index in range (0, numberReq):
         # Calling function to get the access points info
-        getAccessPoints(api_instance, client, index)
+        getAccessPoints(client, index)
 
 # ------------------------------------------ Main Function --------------------------------------------------- 
 
 # Creating the database
 client = createDB()
 
-# Getting the API access token
-api_instance = getAPIAccessToken()
+# Getting the first data from the API
+getAPIAccessToken()
+apiGetAccessPoint(client)
 
-# Calling API methods
-try:
-    # Calling the API to get the access points
-    apiGetAccessPoint(api_instance, client)
-except ApiException as e:
-    print("Exception when calling DefaultApi->access_point_count_get: %s\n" % e)
+# Calling the API to get the access token every hour
+schedule.every().hour.do(getAPIAccessToken)
+
+# Calling the API to get the access points every 16 minutes
+schedule.every(16).minutes.do(apiGetAccessPoint, client)
+
+while True:
+    try:
+        schedule.run_pending()
+        time.sleep(1)
+    except ApiException as e:
+        print("Exception: %s\n" % e)
