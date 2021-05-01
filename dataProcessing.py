@@ -12,10 +12,6 @@ from requests.auth import HTTPBasicAuth
 from influxdb import InfluxDBClient
 from datetime import datetime
 
-# -------------------------------------------- Global Vars ---------------------------------------------------
-
-global timeNow
-
 # -------------------------------- Saving data from the xlsx file to a Dict ----------------------------------
 
 # Function to read the data given from the xlsx file
@@ -53,6 +49,24 @@ def readXlsx(dir, fileName):
 xlsxData = readXlsx('.', 'PrimeCore.xlsx')
 
 # ------------------------------------------- Functions ------------------------------------------------------
+
+# Function to get the API access token (expires each hour)
+def getAPIAccessToken():
+    # Getting the access token
+    url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
+    header = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+    x = requests.post(url,headers=header,auth=HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+    resp = x.json()
+
+    # Configure OAuth2 access token for authorization
+    swagger_client.configuration.access_token = resp["access_token"]
+
+    # create an instance of the API class
+    api_instance = swagger_client.DefaultApi()  
+
+    return api_instance
+
 # Function to create the database
 def createDB():
     client = InfluxDBClient("localhost", 8086, "admin", "PeiGrupo5_2021", "***REMOVED***")
@@ -109,7 +123,7 @@ def writeAccessPointsOnDB(client, info):
 
     data = { 
         "measurement" : "clientsCount",
-        "time" : timeNow,
+        "time" : datetime.now(),
         "tags" : {
             "id" : info[0],
             "name" : info[1],
@@ -143,23 +157,12 @@ def apiGetAccessPoint(api_instance, client):
 # Creating the database
 client = createDB()
 
-# Getting the access token
-url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
-header = {'Content-Type': 'application/x-www-form-urlencoded'}
-
-x = requests.post(url,headers=header,auth=HTTPBasicAuth('***REMOVED***','***REMOVED***'))
-resp = x.json()
-
-# Configure OAuth2 access token for authorization
-swagger_client.configuration.access_token = resp["access_token"]
-
-# create an instance of the API class
-api_instance = swagger_client.DefaultApi()  
+# Getting the API access token
+api_instance = getAPIAccessToken()
 
 # Calling API methods
 try:
     # Calling the API to get the access points
-    timeNow = datetime.now()
     apiGetAccessPoint(api_instance, client)
 except ApiException as e:
     print("Exception when calling DefaultApi->access_point_count_get: %s\n" % e)
