@@ -4,6 +4,7 @@ import swagger_client
 import requests
 import json
 import openpyxl
+import math
 from pathlib import Path
 from swagger_client.rest import ApiException
 from pprint import pprint
@@ -11,7 +12,11 @@ from requests.auth import HTTPBasicAuth
 from influxdb import InfluxDBClient
 from datetime import datetime
 
-# -------------------------------- Saving data from the xlsx file to a Dict ---------------------------------
+# -------------------------------------------- Global Vars ---------------------------------------------------
+
+global timeNow
+
+# -------------------------------- Saving data from the xlsx file to a Dict ----------------------------------
 
 # Function to read the data given from the xlsx file
 def readXlsx(dir, fileName):
@@ -62,7 +67,6 @@ def getAccessPoints(api_response, client, numReq):
     apInfo = []
     numReq = numReq * 100;
 
-    #print("First result: "+str(numReq))
     api_response = api_instance.access_point_get(first_result=numReq)
 
     # Get the first index
@@ -76,8 +80,6 @@ def getAccessPoints(api_response, client, numReq):
 
     stackSize = lastIndex - firstIndex
     for i in range(0, stackSize + 1):
-        #print("Index of AP: "+str(i))
-
         apInfo.append(int(resp[i].id))
         apInfo.append(resp[i].name)    
 
@@ -94,7 +96,6 @@ def getAccessPoints(api_response, client, numReq):
 
         # Clearing the list of access points Info
         apInfo.clear()
-    #print("---------------------------------------------------")
 
 # Function to write the access points Info on the database
 def writeAccessPointsOnDB(client, info):
@@ -108,7 +109,7 @@ def writeAccessPointsOnDB(client, info):
 
     data = { 
         "measurement" : "clientsCount",
-        "time" : datetime.now(),
+        "time" : timeNow,
         "tags" : {
             "id" : info[0],
             "name" : info[1],
@@ -130,20 +131,10 @@ def apiGetAccessPoint(api_instance, client):
     # To get the total number of working access points
     apsCount = int(api_instance.access_point_count_get().count)
 
-    #print("APs Count: "+str(apsCount))
-
     # Defining the number os API requests needed
-    numberReq = int(apsCount / 100)
+    numberReq = math.ceil(apsCount / 100)
 
-    extraReq = 0
-    if(apsCount % 100 != 0):
-        extraReq = 1
-
-    #print("Number os requests: "+str(numberReq+extraReq))
-
-    for index in range (0, numberReq+extraReq):
-        #print("Index from API request:" +str(index))
-
+    for index in range (0, numberReq):
         # Calling function to get the access points info
         getAccessPoints(api_instance, client, index)
 
@@ -168,6 +159,7 @@ api_instance = swagger_client.DefaultApi()
 # Calling API methods
 try:
     # Calling the API to get the access points
+    timeNow = datetime.now()
     apiGetAccessPoint(api_instance, client)
 except ApiException as e:
     print("Exception when calling DefaultApi->access_point_count_get: %s\n" % e)
