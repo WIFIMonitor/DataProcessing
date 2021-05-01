@@ -5,6 +5,7 @@ import requests
 import json
 import openpyxl
 import math
+from bullet import VerticalPrompt, Password, Input
 from pathlib import Path
 from swagger_client.rest import ApiException
 from pprint import pprint
@@ -69,7 +70,14 @@ def getAPIAccessToken():
 
 # Function to create the database
 def createDB():
-    client = InfluxDBClient("localhost", 8086, "admin", "PeiGrupo5_2021", "***REMOVED***")
+    cli = VerticalPrompt([
+        Input(prompt="username: "),
+        Password(prompt="password: ", hidden = "*")],
+        spacing=0)
+    
+    result = cli.launch()
+
+    client = InfluxDBClient("localhost", 8086, str(result[0][1]), str(result[1][1]), "***REMOVED***")
     client.create_database("***REMOVED***")
     client.get_list_database()
     client.switch_database("***REMOVED***")
