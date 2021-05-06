@@ -68,7 +68,7 @@ def getAPIAccessToken():
     # Configure OAuth2 access token for authorization
     swagger_client.configuration.access_token = resp["access_token"]
 
-    print("token: "+str(resp["access_token"]))
+    #print("token: "+str(resp["access_token"]))
 
     # create an instance of the API class
     api_instance = swagger_client.DefaultApi()  
