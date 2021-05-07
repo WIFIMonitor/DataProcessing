@@ -179,8 +179,8 @@ apiGetAccessPoint(client)
 # Calling the API to get the access token every hour
 schedule.every().hour.do(getAPIAccessToken)
 
-# Calling the API to get the access points every 16 minutes
-schedule.every(16).minutes.do(apiGetAccessPoint, client)
+# Calling the API to get the access points every 15 minutes
+schedule.every(15).minutes.do(apiGetAccessPoint, client)
 
 while True:
     try:
