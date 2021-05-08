@@ -76,8 +76,6 @@ def getAPIAccessToken():
     # create an instance of the API class
     api_instance = swagger_client.DefaultApi()  
 
-    # print("expires in: "+str(tokenExpiresIn))
-
 # Function to create the database
 def createDB():
     cli = VerticalPrompt([
@@ -179,14 +177,8 @@ client = createDB()
 
 # Getting the first data from the API
 getAPIAccessToken()
-
-min = math.ceil(tokenExpiresIn / 60)
-schedule.every(min).minutes.do(getAPIAccessToken)
-
+schedule.every(tokenExpiresIn).seconds.do(getAPIAccessToken)
 apiGetAccessPoint(client)
-
-# Calling the API to get the access token every hour
-#schedule.every(5).seconds.do(getAPIAccessToken)
 
 # Calling the API to get the access points every 15 minutes
 schedule.every(15).minutes.do(apiGetAccessPoint, client)
