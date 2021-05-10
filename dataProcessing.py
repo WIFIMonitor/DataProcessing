@@ -192,6 +192,7 @@ def writeAccessPointsOnDB(client, info):
 
 # Function to call the API to get the access points
 def apiGetAccessPoint(client):
+    time.sleep(20)
     print("Calling Access Points")
 
     # To get the total number of working access points
