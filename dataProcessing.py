@@ -55,9 +55,6 @@ xlsxData = readXlsx('.', 'PrimeCore.xlsx')
 
 # Function to get the API access token (expires each hour)
 def getAPIAccessToken():
-    global api_instance 
-    print("Calling token")
-
     # Getting the access token
     url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
     header = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -68,47 +65,12 @@ def getAPIAccessToken():
     # Configure OAuth2 access token for authorization
     swagger_client.configuration.access_token = resp["access_token"]
 
-    tokenExpiresIn = resp["expires_in"]
-
-    setFutureTimeRequest(tokenExpiresIn)
-
     print("token: "+str(swagger_client.configuration.access_token))
 
     # create an instance of the API class
-    api_instance = swagger_client.DefaultApi()  
+    api_instance = swagger_client.DefaultApi() 
 
-# Function to set the time at which the access token should be obtained
-def setFutureTimeRequest(tokenExpiresIn):
-    global hours
-
-    #print("Expires in: "+str(tokenExpiresIn))
-
-    min = int(tokenExpiresIn / 60)
-    sec = tokenExpiresIn % 60
-
-    timeNow = datetime.now()
-
-    #print("Time right now: "+str(timeNow))
-
-    timeAdded = timedelta(minutes = min, seconds = sec) 
-
-    futureDate = timeNow + timeAdded
-
-    #print("Future date: "+str(futureDate))
-
-    futureH = str(futureDate.hour)
-    futureM = str(futureDate.minute)
-    futureS = str(futureDate.second) 
-
-    if(futureDate.hour < 10):
-        futureH = "0" + futureH
-    if(futureDate.minute < 10):
-        futureM = "0" + futureM
-    if(futureDate.second < 10):
-        futureS = "0" + futureS      
-
-    hours = str(futureH) +":"+ str(futureM) +":"+ str(futureS)
-    #print(hours)
+    return api_instance 
 
 # Function to create the database
 def createDB():
@@ -127,7 +89,7 @@ def createDB():
     return client
 
 # Function to get access points Info
-def getAccessPoints(client, numReq):
+def getAccessPoints(client, numReq, api_instance):
     apInfo = []
     numReq = numReq * 100;
 
@@ -192,7 +154,7 @@ def writeAccessPointsOnDB(client, info):
 
 # Function to call the API to get the access points
 def apiGetAccessPoint(client):
-    time.sleep(20)
+    api_instance = getAPIAccessToken()
     print("Calling Access Points")
 
     # To get the total number of working access points
@@ -203,17 +165,14 @@ def apiGetAccessPoint(client):
 
     for index in range (0, numberReq):
         # Calling function to get the access points info
-        getAccessPoints(client, index)
+        getAccessPoints(client, index, api_instance)
 
 # ------------------------------------------ Main Function --------------------------------------------------- 
 
 # Creating the database
 client = createDB()
 
-# Getting the first data from the API
-getAPIAccessToken()
-schedule.every().day.at(hours).do(getAPIAccessToken)
-
+# Getting the initial information about the access points
 apiGetAccessPoint(client)
 
 # Calling the API to get the access points every 15 minutes
