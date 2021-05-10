@@ -13,7 +13,7 @@ from swagger_client.rest import ApiException
 from pprint import pprint
 from requests.auth import HTTPBasicAuth
 from influxdb import InfluxDBClient
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # -------------------------------- Saving data from the xlsx file to a Dict ----------------------------------
 
@@ -56,7 +56,6 @@ xlsxData = readXlsx('.', 'PrimeCore.xlsx')
 # Function to get the API access token (expires each hour)
 def getAPIAccessToken():
     global api_instance 
-    global tokenExpiresIn 
     print("Calling token")
 
     # Getting the access token
@@ -71,10 +70,45 @@ def getAPIAccessToken():
 
     tokenExpiresIn = resp["expires_in"]
 
+    setFutureTimeRequest(tokenExpiresIn)
+
     print("token: "+str(swagger_client.configuration.access_token))
 
     # create an instance of the API class
     api_instance = swagger_client.DefaultApi()  
+
+# Function to set the time at which the access token should be obtained
+def setFutureTimeRequest(tokenExpiresIn):
+    global hours
+
+    #print("Expires in: "+str(tokenExpiresIn))
+
+    min = int(tokenExpiresIn / 60)
+    sec = tokenExpiresIn % 60
+
+    timeNow = datetime.now()
+
+    #print("Time right now: "+str(timeNow))
+
+    timeAdded = timedelta(minutes = min, seconds = sec) 
+
+    futureDate = timeNow + timeAdded
+
+    #print("Future date: "+str(futureDate))
+
+    futureH = str(futureDate.hour)
+    futureM = str(futureDate.minute)
+    futureS = str(futureDate.second) 
+
+    if(futureDate.hour < 10):
+        futureH = "0" + futureH
+    if(futureDate.minute < 10):
+        futureM = "0" + futureM
+    if(futureDate.second < 10):
+        futureS = "0" + futureS      
+
+    hours = str(futureH) +":"+ str(futureM) +":"+ str(futureS)
+    #print(hours)
 
 # Function to create the database
 def createDB():
@@ -177,7 +211,8 @@ client = createDB()
 
 # Getting the first data from the API
 getAPIAccessToken()
-schedule.every(tokenExpiresIn).seconds.do(getAPIAccessToken)
+schedule.every().day.at(hours).do(getAPIAccessToken)
+
 apiGetAccessPoint(client)
 
 # Calling the API to get the access points every 15 minutes
