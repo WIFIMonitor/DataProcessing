@@ -1,19 +1,11 @@
 from __future__ import print_function
-import time
-import swagger_client
-import requests
-import json
-import openpyxl
-import math
-import schedule
-import time
-from bullet import VerticalPrompt, Password, Input
+from os.path import split
+import swagger_client, requests, openpyxl, math, schedule, sys, logging
 from pathlib import Path
 from swagger_client.rest import ApiException
-from pprint import pprint
 from requests.auth import HTTPBasicAuth
 from influxdb import InfluxDBClient
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # -------------------------------- Saving data from the xlsx file to a Dict ----------------------------------
 
@@ -66,6 +58,7 @@ def getAPIAccessToken():
     swagger_client.configuration.access_token = resp["access_token"]
 
     print("token: "+str(swagger_client.configuration.access_token))
+    logger.info("token: "+str(swagger_client.configuration.access_token))
 
     # create an instance of the API class
     api_instance = swagger_client.DefaultApi() 
@@ -74,14 +67,7 @@ def getAPIAccessToken():
 
 # Function to create the database
 def createDB():
-    cli = VerticalPrompt([
-        Input(prompt="username: "),
-        Password(prompt="password: ", hidden = "*")],
-        spacing=0)
-    
-    result = cli.launch()
-
-    client = InfluxDBClient("localhost", 8086, str(result[0][1]), str(result[1][1]), "***REMOVED***")
+    client = InfluxDBClient("localhost", 8086, str(sys.argv[1]), str(sys.argv[2]), "***REMOVED***")
     client.create_database("***REMOVED***")
     client.get_list_database()
     client.switch_database("***REMOVED***")
@@ -109,10 +95,34 @@ def getAccessPoints(client, numReq, api_instance):
         apInfo.append(int(resp[i].id))
         apInfo.append(resp[i].name)    
 
-        # Get the building by the id
-        building = xlsxData[apInfo[0]].get('building')
-        apInfo.append(building)
+        keys = xlsxData.keys()
 
+        # Get the building by the id
+        if(apInfo[0] in keys):
+            building = xlsxData[apInfo[0]].get('building')
+        # If a new access point is turned on
+        else:
+            id = int(resp[i].id)
+            newRequest = api_instance.access_point_id_get(id)
+            splits = newRequest.name.split('-')
+
+            apData = {
+                'location' : newRequest.location,
+                'name' : newRequest.name,
+                'latitude' : None,
+                'longitude' : None,
+                'responsible' : None,
+                'building' :  splits[0]
+            }
+
+            # Save new access point data into the dict 
+            xlsxData[id] = apData
+            building = splits[0]
+
+            # Write the new access point data into the xlsx file
+            writeXlsx('.', 'PrimeCore.xlsx', id, apData)
+
+        apInfo.append(building)
         apInfo.append(int(resp[i].client_count))    
         apInfo.append(int(resp[i].client_count_2_4_g_hz))
         apInfo.append(int(resp[i].client_count_5_g_hz))    
@@ -122,6 +132,33 @@ def getAccessPoints(client, numReq, api_instance):
 
         # Clearing the list of access points Info
         apInfo.clear()
+
+# Function to write the new access point data into the xlsx file
+def writeXlsx(dir, fileName, id, apData):
+    # Setting the path to the xlsx file:
+    xlsx_file = Path(dir, fileName)
+
+    # Read the Excel File
+    wb_obj = openpyxl.load_workbook(xlsx_file)
+
+    # Read the Active Sheet from the Excel file
+    sheet = wb_obj.active
+
+    maxRows = sheet.max_row
+    
+    col = sheet["A" + str(maxRows+1)]
+    col.value = id 
+    
+    list = []
+    for key in apData.keys():
+        list.append(key)
+
+    cols = ["B","C","D","E","F","G"]
+    for i in range(0, len(cols)):
+        col = sheet[cols[i] + str(maxRows+1)]
+        col.value = apData.get(list[i])
+
+    wb_obj.save("./PrimeCore.xlsx")
 
 # Function to write the access points Info on the database
 def writeAccessPointsOnDB(client, info):
@@ -156,6 +193,7 @@ def writeAccessPointsOnDB(client, info):
 def apiGetAccessPoint(client):
     api_instance = getAPIAccessToken()
     print("Calling Access Points")
+    logger.info("Calling Access Points")
 
     # To get the total number of working access points
     apsCount = int(api_instance.access_point_count_get().count)
@@ -169,11 +207,19 @@ def apiGetAccessPoint(client):
 
 # ------------------------------------------ Main Function --------------------------------------------------- 
 
+# Creating the log file for the service
+logging.basicConfig(filename='/var/log/dataProcessing.log', level=logging.INFO)
+logger = logging.getLogger("DATA PROCESSING")
+
 # Creating the database
 client = createDB()
 
 # Getting the initial information about the access points
+#try:
 apiGetAccessPoint(client)
+#except Exception as e:
+#    print("Access Point Exception: " +str(e))
+#    logger.error("Access Point Exception: " +str(e))
 
 # Calling the API to get the access points every 15 minutes
 schedule.every(15).minutes.do(apiGetAccessPoint, client)
@@ -182,4 +228,4 @@ while True:
     try:
         schedule.run_pending()
     except ApiException as e:
-        print("Exception: %s\n" % e)
+        logger.error("Exception: %s\n" % e)
