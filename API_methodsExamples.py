@@ -47,7 +47,7 @@ try:
     #
     # **GET** /AccessPoint/{name}/TotalUsernames
     #
-    #api_response = api_instance.access_point_name_total_usernames_get("dbio-ap13")
+    #api_response = api_instance.access_point_name_total_usernames_get("estga-sap11.core.ua.pt")
     #pprint(api_response)
     
     #

@@ -94,7 +94,7 @@ def getAccessPoints(client, numReq, api_instance):
     for i in range(0, stackSize + 1):
         apInfo.append(int(resp[i].id))
         apInfo.append(resp[i].name)    
-
+        
         keys = xlsxData.keys()
 
         # Get the building by the id
