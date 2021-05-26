@@ -5,3 +5,5 @@ setuptools >= 21.0.0
 urllib3 >= 1.15.1
 bullet >= 2.2.0
 schedule >= 1.1.0
+plotly >= 4.14.3
+pandas >= 1.2.4
