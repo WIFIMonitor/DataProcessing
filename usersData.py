@@ -77,7 +77,7 @@ if __name__ == "__main__":
         print("Users Count Exception: " +str(e))
         logger.error("Users Count Exception: " +str(e))
 
-    # Calling the API to get the access points every 15 minutes
+    # Calling the API to get the users info every 12 minutes
     try:
         schedule.every(12).minutes.do(apiGetUsers, client, logger)
     except Exception as e:

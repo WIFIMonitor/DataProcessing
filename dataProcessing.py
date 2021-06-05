@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
     # Calling the API to get the access points every 15 minutes
     try:
-        schedule.every(15).minutes.do(apiGetAccessPoint, client)
+        schedule.every(15).minutes.do(apiGetAccessPoint, client, logger)
     except Exception as e:
         print("Access Point Exception: " +str(e))
         logger.error("Access Point Exception: " +str(e))
