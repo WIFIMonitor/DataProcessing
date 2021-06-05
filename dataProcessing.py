@@ -41,12 +41,10 @@ def readXlsx(dir, fileName):
 
     return accessPoints
 
-xlsxData = readXlsx('.', 'PrimeCore.xlsx')
-
 # ------------------------------------------- Functions ------------------------------------------------------
 
 # Function to get the API access token (expires each hour)
-def getAPIAccessToken():
+def getAPIAccessToken(logger):
     # Getting the access token
     url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
     header = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -190,8 +188,8 @@ def writeAccessPointsOnDB(client, info):
     client.write_points(json_payload)
 
 # Function to call the API to get the access points
-def apiGetAccessPoint(client):
-    api_instance = getAPIAccessToken()
+def apiGetAccessPoint(client, logger):
+    api_instance = getAPIAccessToken(logger)
     print("Calling Access Points")
     logger.info("Calling Access Points")
 
@@ -207,25 +205,34 @@ def apiGetAccessPoint(client):
 
 # ------------------------------------------ Main Function --------------------------------------------------- 
 
-# Creating the log file for the service
-logging.basicConfig(filename='/var/log/dataProcessing.log', level=logging.INFO)
-logger = logging.getLogger("DATA PROCESSING")
+if __name__ == "__main__":
 
-# Creating the database
-client = createDB()
+    # Data given from the xlsx file
+    xlsxData = readXlsx('.', 'PrimeCore.xlsx')
 
-# Getting the initial information about the access points
-#try:
-apiGetAccessPoint(client)
-#except Exception as e:
-#    print("Access Point Exception: " +str(e))
-#    logger.error("Access Point Exception: " +str(e))
+    # Creating the log file for the service
+    logging.basicConfig(filename='/var/log/dataProcessing.log', level=logging.INFO)
+    logger = logging.getLogger("DATA PROCESSING")
 
-# Calling the API to get the access points every 15 minutes
-schedule.every(15).minutes.do(apiGetAccessPoint, client)
+    # Creating the database
+    client = createDB()
 
-while True:
+    # Getting the initial information about the access points
     try:
-        schedule.run_pending()
-    except ApiException as e:
-        logger.error("Exception: %s\n" % e)
+        apiGetAccessPoint(client, logger)
+    except Exception as e:
+        print("Access Point Exception: " +str(e))
+        logger.error("Access Point Exception: " +str(e))
+
+    # Calling the API to get the access points every 15 minutes
+    try:
+        schedule.every(15).minutes.do(apiGetAccessPoint, client)
+    except Exception as e:
+        print("Access Point Exception: " +str(e))
+        logger.error("Access Point Exception: " +str(e))
+
+    while True:
+        try:
+            schedule.run_pending()
+        except ApiException as e:
+            logger.error("Exception: %s\n" % e)

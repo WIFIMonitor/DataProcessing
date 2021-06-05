@@ -23,8 +23,8 @@ try:
     #
     # **GET** /AccessPoint
     #
-    api_response = api_instance.access_point_get(first_result=700)
-    pprint(api_response)
+    #api_response = api_instance.access_point_get(first_result=0)
+    #pprint(api_response)
     
     #
     # **GET** /AccessPoint/Count
@@ -47,8 +47,8 @@ try:
     #
     # **GET** /AccessPoint/{name}/TotalUsernames
     #
-    #api_response = api_instance.access_point_name_total_usernames_get("estga-sap11.core.ua.pt")
-    #pprint(api_response)
+    api_response = api_instance.access_point_name_total_usernames_get("estga-sap14.core.ua.pt")
+    pprint(api_response)
     
     #
     # **GET** /Building
@@ -59,7 +59,7 @@ try:
     #
     # **GET** /NetworkMetric/{building}
     #
-    #api_response = api_instance.network_metric_building_get("DBIO", "rx")
+    #api_response = api_instance.network_metric_building_get("DETI", "rx")
     #pprint(api_response)
 
     #
