@@ -1,5 +1,6 @@
 from __future__ import print_function
 import time
+from usersData import apiGetUsers
 import swagger_client
 import requests
 from swagger_client.rest import ApiException
@@ -41,14 +42,14 @@ try:
     #
     # **GET** /AccessPoint/{name}/DeviceTypeCount
     #
-    #api_response = api_instance.access_point_name_device_type_count_get("biblioteca-ap11")
-    #pprint(api_response)
+    api_response = api_instance.access_point_name_device_type_count_get("biblioteca-ap11")
+    pprint(api_response)
     
     #
     # **GET** /AccessPoint/{name}/TotalUsernames
     #
-    api_response = api_instance.access_point_name_total_usernames_get("estga-sap14.core.ua.pt")
-    pprint(api_response)
+    #api_response = api_instance.access_point_name_total_usernames_get("estga-sap14.core.ua.pt")
+    #pprint(api_response)
     
     #
     # **GET** /Building
@@ -59,7 +60,7 @@ try:
     #
     # **GET** /NetworkMetric/{building}
     #
-    #api_response = api_instance.network_metric_building_get("DETI", "rx")
+    #api_response = api_instance.network_metric_building_get("IT", "rx")
     #pprint(api_response)
 
     #
