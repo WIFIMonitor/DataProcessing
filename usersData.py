@@ -17,6 +17,7 @@ def apiGetUsers(client, logger):
 
     for key in xlsxData.keys():
         time.sleep(1)
+        api_instance = getAPIAccessToken(logger)
         apInfo.append(key)
 
         name = xlsxData[key].get('name')

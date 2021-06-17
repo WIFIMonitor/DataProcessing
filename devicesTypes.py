@@ -17,6 +17,7 @@ def apiGetDevices(client, logger):
 
     for key in xlsxData.keys():
         time.sleep(1)
+        api_instance = getAPIAccessToken(logger) 
         devicesInfo.append(key)
 
         name = xlsxData.get(key).get("name")
