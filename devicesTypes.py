@@ -16,7 +16,7 @@ def apiGetDevices(client, logger):
     logger.info("Calling Devices Types")
 
     for key in xlsxData.keys():
-        time.sleep(0.7)
+        time.sleep(1)
         devicesInfo.append(key)
 
         name = xlsxData.get(key).get("name")
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     # Calling the API to get the metrics info every 8 minutes
     try:
-        schedule.every(8).minutes.do(apiGetDevices, client, logger)
+        schedule.every(30).minutes.do(apiGetDevices, client, logger)
     except Exception as e:
         print("Devices types Exception: " +str(e))
         logger.error("Devices types Exception: " +str(e))

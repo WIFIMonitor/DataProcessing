@@ -16,7 +16,7 @@ def apiGetUsers(client, logger):
     logger.info("Calling Users")
 
     for key in xlsxData.keys():
-        time.sleep(0.05)
+        time.sleep(1)
         apInfo.append(key)
 
         name = xlsxData[key].get('name')
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # Calling the API to get the users info every 12 minutes
     try:
-        schedule.every(12).minutes.do(apiGetUsers, client, logger)
+        schedule.every(30).minutes.do(apiGetUsers, client, logger)
     except Exception as e:
         print("Users Count Exception: " +str(e))
         logger.error("Users Count Exception: " +str(e))
