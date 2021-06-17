@@ -27,12 +27,13 @@ def apiGetDevices(client, logger):
         devicesResponse = api_instance.access_point_name_device_type_count_get(name)
         dic = formatResponse(devicesResponse)
 
-        devicesInfo.append(dic.get("android"))
-        devicesInfo.append(dic.get("ios"))
-        devicesInfo.append(dic.get("laptop"))
+        if dic != None:
+            devicesInfo.append(dic.get("android"))
+            devicesInfo.append(dic.get("ios"))
+            devicesInfo.append(dic.get("laptop"))
 
-        writeDevicesOnDB(client, devicesInfo)
-        devicesInfo.clear()
+            writeDevicesOnDB(client, devicesInfo)
+            devicesInfo.clear()
 
 # Function to format the response getted from te API
 def formatResponse(response):
@@ -40,50 +41,53 @@ def formatResponse(response):
     ios = 0
     laptop = 0
 
-    for device in response.device_type_counts:
-        # Getting the number of laptops 
-        if "Unclassified" in device.device_type:
-            laptop += device.count
-        if "Intel-Device" in device.device_type:
-            laptop += device.count
-        if "Microsoft-Device" in device.device_type:
-            laptop += device.count
-        if "Unknown" in device.device_type:
-            laptop += device.count
+    if response.device_type_counts != None:
+        for device in response.device_type_counts:
+            # Getting the number of laptops 
+            if "Unclassified" in device.device_type:
+                laptop += device.count
+            if "Intel-Device" in device.device_type:
+                laptop += device.count
+            if "Microsoft-Device" in device.device_type:
+                laptop += device.count
+            if "Unknown" in device.device_type:
+                laptop += device.count
 
-        # Getting the number of android devices 
-        if "Samsung" in device.device_type:
-            android += device.count
-        if "Huawei" in device.device_type:
-            android += device.count
-        if "ZTE" in device.device_type:
-            android += device.count
-        if "ASUS" in device.device_type:
-            android += device.count
-        if "MotorolaMobile" in device.device_type:
-            android += device.count
-        if "LG" in device.device_type:
-            android += device.count
-        if "Sony" in device.device_type:
-            android += device.count
-        
-        # Getting the number of ios devices 
-        if "Apple" in device.device_type:
-            ios += device.count
-        if "iPhone" in device.device_type:
-            ios += device.count
-        if "iPad" in device.device_type:
-            ios += device.count
+            # Getting the number of android devices 
+            if "Samsung" in device.device_type:
+                android += device.count
+            if "Huawei" in device.device_type:
+                android += device.count
+            if "ZTE" in device.device_type:
+                android += device.count
+            if "ASUS" in device.device_type:
+                android += device.count
+            if "MotorolaMobile" in device.device_type:
+                android += device.count
+            if "LG" in device.device_type:
+                android += device.count
+            if "Sony" in device.device_type:
+                android += device.count
+            
+            # Getting the number of ios devices 
+            if "Apple" in device.device_type:
+                ios += device.count
+            if "iPhone" in device.device_type:
+                ios += device.count
+            if "iPad" in device.device_type:
+                ios += device.count
 
     # print(type(laptop))
     # print(type(ios))
     # print(type(android))
 
-    return {
-        "laptop": int(laptop),
-        "ios": int(ios),
-        "android": int(android)
-    }
+        return {
+            "laptop": int(laptop),
+            "ios": int(ios),
+            "android": int(android)
+        }
+
+    return None
 
 # Function to write the devices types on the database
 def writeDevicesOnDB(client, info):
