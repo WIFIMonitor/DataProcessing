@@ -193,15 +193,16 @@ def apiGetAccessPoint(client, logger):
     print("Calling Access Points")
     logger.info("Calling Access Points")
 
-    # To get the total number of working access points
-    apsCount = int(api_instance.access_point_count_get().count)
+    if api_instance.access_point_count_get().count != None:
+        # To get the total number of working access points
+        apsCount = int(api_instance.access_point_count_get().count)
 
-    # Defining the number os API requests needed
-    numberReq = math.ceil(apsCount / 100)
+        # Defining the number os API requests needed
+        numberReq = math.ceil(apsCount / 100)
 
-    for index in range (0, numberReq):
-        # Calling function to get the access points info
-        getAccessPoints(client, index, api_instance)
+        for index in range (0, numberReq):
+            # Calling function to get the access points info
+            getAccessPoints(client, index, api_instance)
 
 # ------------------------------------------ Main Function --------------------------------------------------- 
 
