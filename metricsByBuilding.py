@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from swagger_client.rest import ApiException
 import schedule
+import time
 from dataProcessing import getAPIAccessToken, createDB
 
 # ------------------------------------------- Functions ------------------------------------------------------
@@ -18,14 +19,16 @@ def apiGetMetrics(client, logger):
     buildings = api_instance.building_get().buildings
     
     # These buildings put the API in a timeout state
-    buildings.remove("STIC")
-    buildings.remove("LABTEC")
-    buildings.remove("RALUNOS")
-    buildings.remove("EDIF3")
-    buildings.remove("IT")
+    buildings.remove("STIC") # Está a retornar vazio
+    buildings.remove("LABTEC") # Está a retornar vazio
+    buildings.remove("RALUNOS") # Não funciona
+    buildings.remove("EDIF3") # Está a retornar vazio
+    buildings.remove("AAUAV")
     #--------------------------------------------------
 
     for build in buildings:
+        time.sleep(1)
+        api_instance = getAPIAccessToken(logger)
         buildingInfo.append(build)
         rx_response = api_instance.network_metric_building_get(build, "rx")
         rx = formatResponse(rx_response)
@@ -37,6 +40,7 @@ def apiGetMetrics(client, logger):
 
         writeMetricsOnDB(client, buildingInfo)
         buildingInfo.clear()
+
 
 # Function to format the response getted from te API
 def formatResponse(response):
@@ -108,7 +112,7 @@ if __name__ == "__main__":
 
     # Calling the API to get the metrics info every 15 minutes
     try:
-        schedule.every(15).minutes.do(apiGetMetrics, client, logger)
+        schedule.every(20).minutes.do(apiGetMetrics, client, logger)
     except Exception as e:
         print("Building metrics Exception: " +str(e))
         logger.error("Building metrics Exception: " +str(e))
