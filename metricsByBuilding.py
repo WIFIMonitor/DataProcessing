@@ -50,8 +50,8 @@ def formatResponse(response):
     size = len(response.metrics_data.values)
     
     lst = []
-    for i in range(1, 4):
-        # Obtain the last 3 measurement 
+    for i in range(1, 5):
+        # Obtain the last 4 measurement 
         dic = response.metrics_data.values[size-i].y_values.to_dict()
         valueList = list(dic.values())
 
