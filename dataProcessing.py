@@ -49,7 +49,7 @@ def getAPIAccessToken(logger):
     url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
     header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-    x = requests.post(url,headers=header,auth=HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+    x = requests.post(url,headers=header,auth=HTTPBasicAuth('XXXXXXXX','XXXXXXXX'))
     resp = x.json()
 
     # Configure OAuth2 access token for authorization
@@ -65,10 +65,10 @@ def getAPIAccessToken(logger):
 
 # Function to create the database
 def createDB():
-    client = InfluxDBClient("localhost", 8086, str(sys.argv[1]), str(sys.argv[2]), "***REMOVED***")
-    client.create_database("***REMOVED***")
+    client = InfluxDBClient("localhost", 8086, str(sys.argv[1]), str(sys.argv[2]), "WiFiMonitor")
+    client.create_database("WiFiMonitor")
     client.get_list_database()
-    client.switch_database("***REMOVED***")
+    client.switch_database("WiFiMonitor")
 
     return client
 

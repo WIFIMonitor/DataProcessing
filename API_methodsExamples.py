@@ -11,7 +11,7 @@ from requests.auth import HTTPBasicAuth
 url = 'https://wso2-gw.ua.pt/token?grant_type=client_credentials&state=123&scope=openid'
 header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-x = requests.post(url,headers=header,auth=HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+x = requests.post(url,headers=header,auth=HTTPBasicAuth('XXXXXXX','XXXXXXXXX'))
 resp = x.json()
 
 # Configure OAuth2 access token for authorization
